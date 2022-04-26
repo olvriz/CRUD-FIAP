@@ -5,16 +5,15 @@
 - build: build de assets para desenvolvimento local
 - start: inicia a aplicação
 
-## API Information: Swagger
+## Informações de serviços: Swagger
+
+**rotas**
+```bash
+http://localhost
+```
 
 ## Running
 
 ### All dependencies modules (WIP)
 
 ## Setup
-
-## Testes unitários
-
-```bash
-npm run test
-```
