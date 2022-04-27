@@ -1,11 +1,7 @@
 # MVP - Projeto Fiap
 
-## Tarefas disponíveis
-
-- build: build de assets para desenvolvimento local
-- start: inicia a aplicação
-
 ## Informações de serviços: Swagger
+Documentação disponível na própria aplicação
 
 **rotas**
 ```bash
