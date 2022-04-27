@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Fiap.Domain.Models.Request
 {
-    public class AuthenticateRequest
+    public class CriminalUpdateRequest : CriminalCreateRequest
     {
-
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public int Id { get; set; }
     }
 }

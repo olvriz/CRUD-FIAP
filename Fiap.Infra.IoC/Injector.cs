@@ -16,13 +16,15 @@ namespace Fiap.Infra.IoC
         {
             services.AddScoped<IUserLogged, UserLogged>();
 
-            services.AddSingleton<MsSqlContext, MsSqlContext>();
+            services.AddSingleton<OrcContext, OrcContext>();
 
-            services.AddTransient<IAccountRepository, AccountRepository>();
-            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ICriminalRepository, CriminalRepository>();
+            services.AddTransient<IVictimRepository, VictimRepository>();
+            services.AddTransient<ICrimeRepository, CrimeRepository>();
 
-            services.AddTransient<IAccountDomainService, AccountDomainService>();
-            services.AddTransient<IUserDomainService, UserDomainService>();
+            services.AddTransient<ICriminalDomainService, CriminalDomainService>();
+            services.AddTransient<IVictimDomainService, VictimDomainService>();
+            services.AddTransient<ICrimeDomainService, CrimeDomainService>();
 
             services.AddTransient<IAuthenticatorService, AuthenticatorService>();
         }

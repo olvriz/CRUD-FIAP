@@ -1,81 +1,28 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Fiap.Domain.Auth;
-using Fiap.Domain.DomainServiceInterface;
+﻿using Fiap.Domain.DomainServiceInterface;
 using Fiap.Domain.Enums;
 using Fiap.Domain.Extensions;
 using Fiap.Domain.Models.Request;
-using Fiap.Domain.Strings;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fiap.Api.Controllers
 {
-    [Route("api/account")]
-    public class AccountController : ControllerBase
+    [Route("api/crime")]
+    public class CrimeController : ControllerBase
     {
-        private readonly IAccountDomainService _accountDomainService;
-        private readonly IUserLogged _userLogged;
+        private readonly ICrimeDomainService _crimeDomainService;
 
-        public AccountController(IAccountDomainService accountDomainService, IUserLogged userLogged)
+        public CrimeController(ICrimeDomainService crimeDomainService)
         {
-            _accountDomainService = accountDomainService;
-            _userLogged = userLogged;
-        }
-        
-        [Authorize]
-        [HttpGet("balance")]
-        public async Task<IActionResult> GetCurrentBalance()
-        {            
-            try
-            {
-                var accountBalance = await _accountDomainService.GetAccountBalanceByUser(_userLogged.Id);
-
-                return Ok(accountBalance);                
-            }
-            catch (ApplicationException ae)
-            {
-                return BadRequest(ae.Message.ToResponseMessage());                
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                return StatusCode(HttpCodes.InternalError, e.Message.ToResponseMessage());
-#else
-                return StatusCode(HttpCodes.InternalError, ErrorMessages.DefaultErrorMessage.ToResponseMessage());                
-#endif                               
-            }
+            _crimeDomainService = crimeDomainService;
         }
 
-        [Authorize]
-        [HttpGet("balance/future")]
-        public async Task<IActionResult> GetFutureBalance([FromQuery] DateTime balanceDate)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CrimeCreateRequest createRequest)
         {
             try
             {
-                var futureAccountBalance = await _accountDomainService.GetFutureAccountBalanceByUser(_userLogged.Id, balanceDate);
 
-                return Ok(futureAccountBalance);
-            }
-            catch (ApplicationException ae)
-            {
-                return BadRequest(ae.Message.ToResponseMessage());
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                return StatusCode(HttpCodes.InternalError, e.Message.ToResponseMessage());
-#else
-                return StatusCode(HttpCodes.InternalError, ErrorMessages.DefaultErrorMessage.ToResponseMessage());                
-#endif  
-            }
-        }
-
-        [Authorize]
-        [HttpPost("credit")]
-        public async Task<IActionResult> CreditAccount([FromBody] CreditAccountRequest creditAccount)
-        {
-            try
-            {
-                var hasSuccess = await _accountDomainService.CreditUserAccount(creditAccount, _userLogged.Id);
+                var hasSuccess = await _crimeDomainService.Create(createRequest);
 
                 if (!hasSuccess)
                     throw new Exception();
@@ -96,18 +43,62 @@ namespace Fiap.Api.Controllers
             }
         }
 
-        [Authorize]
-        [HttpPost("debit")]
-        public async Task<IActionResult> DebitAccount([FromBody] DebitAccountRequest debitAccount)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var hasSuccess = await _accountDomainService.DebitUserAccount(debitAccount, _userLogged.Id);
+
+                return Ok(await _crimeDomainService.GetAll());
+            }
+            catch (ApplicationException ae)
+            {
+                return BadRequest(ae.Message.ToResponseMessage());
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                return StatusCode(HttpCodes.InternalError, e.Message.ToResponseMessage());
+#else
+                return StatusCode(HttpCodes.InternalError, ErrorMessages.DefaultErrorMessage.ToResponseMessage());                
+#endif  
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
+        {
+            try
+            {
+
+                return Ok(await _crimeDomainService.GetById(id));
+            }
+            catch (ApplicationException ae)
+            {
+                return BadRequest(ae.Message.ToResponseMessage());
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                return StatusCode(HttpCodes.InternalError, e.Message.ToResponseMessage());
+#else
+                return StatusCode(HttpCodes.InternalError, ErrorMessages.DefaultErrorMessage.ToResponseMessage());                
+#endif  
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] CrimeUpdateRequest update)
+        {
+            try
+            {
+
+                var hasSuccess = await _crimeDomainService.Update(update);
 
                 if (!hasSuccess)
                     throw new Exception();
 
-                return StatusCode(HttpCodes.NoContent);
+                return StatusCode(HttpCodes.Created);
             }
             catch (ApplicationException ae)
             {
@@ -123,15 +114,19 @@ namespace Fiap.Api.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("extract")]
-        public async Task<IActionResult> GetAccountExtract([FromQuery] DateTime initialDate, DateTime finishDate)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try
             {
-                var futureAccountBalance = await _accountDomainService.GetAccountExtract(_userLogged.Id, initialDate, finishDate);
+                var hasSuccess = await _crimeDomainService.Delete(id);
 
-                return Ok(futureAccountBalance);
+                if (!hasSuccess)
+                    throw new Exception();
+
+                return StatusCode(HttpCodes.Created);
+
             }
             catch (ApplicationException ae)
             {
@@ -146,5 +141,6 @@ namespace Fiap.Api.Controllers
 #endif  
             }
         }
+
     }
 }
